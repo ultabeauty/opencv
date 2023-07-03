@@ -44,7 +44,7 @@ else:
 sys.path.insert(0, os.path.abspath(os.path.abspath(os.path.dirname(__file__))+'/../apple'))
 from cv_build_utils import execute, print_error, get_xcode_major, get_xcode_setting, get_xcode_version, get_cmake_version
 
-IPHONEOS_DEPLOYMENT_TARGET='9.0'  # default, can be changed via command line options or environment variable
+IPHONEOS_DEPLOYMENT_TARGET='11.0'  # default, can be changed via command line options or environment variable
 
 class Builder:
     def __init__(self, opencv, contrib, dynamic, bitcodedisabled, exclude, disable, enablenonfree, targets, debug, debug_info, framework_name, run_tests, build_docs, swiftdisabled):
@@ -107,6 +107,10 @@ class Builder:
             dirs.append(main_build_dir)
 
             cmake_flags = []
+            cmake_flags.append("-DBUILD_PROTOBUF=OFF")
+            cmake_flags.append("-DBUILD_opencv_dnn=OFF")
+            cmake_flags.append("-DWITH_JPEG=OFF")
+            cmake_flags.append("-DBUILD_JPEG=OFF")
             if self.contrib:
                 cmake_flags.append("-DOPENCV_EXTRA_MODULES_PATH=%s" % self.contrib)
             if xcode_ver >= 7 and target[1] == 'iPhoneOS' and self.bitcodedisabled == False:
@@ -560,7 +564,7 @@ if __name__ == "__main__":
         iphonesimulator_archs = args.iphonesimulator_archs.split(',')
     elif not args.build_only_specified_archs:
         # Supply defaults
-        iphonesimulator_archs = ["i386", "x86_64"]
+        iphonesimulator_archs = []
     print('Using iPhoneSimulator ARCHS=' + str(iphonesimulator_archs))
 
     # Prevent the build from happening if the same architecture is specified for multiple platforms.
